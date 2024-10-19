@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Virtual Conference Space</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap");
+
+      body {
+        font-family: "Roboto", sans-serif;
+        background-color: #f4f5f7;
+        color: #333;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      .container {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 20px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        width: 90%;
+        max-width: 1200px;
+        padding: 20px;
+        align-items: stretch;
+      }
+
+      .video-section,
+      .chat-section {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        height: 100%;
+      }
+
+      .video-section {
+        justify-content: space-between;
+      }
+
+      video {
+        width: 100%;
+        height: 100%;
+        border-radius: 10px;
+        background-color: #000;
+        border: none;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .controls {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      button {
+        flex: 1;
+        padding: 12px;
+        background-color: #0052cc;
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      button:hover {
+        background-color: #006aff;
+        box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+      }
+
+      .chat-section {
+        background-color: #f9f9f9;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        height: 100%;
+      }
+
+      .chat-header {
+        font-size: 18px;
+        font-weight: bold;
+        color: #333;
+      }
+
+      .chat-box {
+        flex-grow: 1;
+        background-color: #fff;
+        border-radius: 10px;
+        padding: 10px;
+        overflow-y: auto;
+        box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.1);
+        transition: box-shadow 0.3s ease;
+      }
+
+      .chat-box:hover {
+        box-shadow: inset 0 6px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      .chat-input {
+        display: flex;
+        gap: 10px;
+      }
+
+      .chat-input input {
+        flex: 1;
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        font-size: 14px;
+        transition: border 0.3s ease;
+      }
+
+      .chat-input input:focus {
+        border: 1px solid #00cc88;
+      }
+
+      .chat-input button {
+        background-color: #00cc88;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+        cursor: pointer;
+        color: white;
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .chat-input button:hover {
+        background-color: #00aa70;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      /* Emoji Floating Container */
+      #emojiContainer {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        pointer-events: none;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+      }
+
+      .emoji {
+        font-size: 40px;
+        position: absolute;
+        bottom: 0;
+        cursor: pointer;
+        animation: growAndFloat 4s ease-in-out forwards;
+        transition: transform 0.3s ease;
+      }
+
+      .emoji:hover {
+        transform: scale(1.5);
+      }
+
+      /* Animasi membesar dan melayang */
+      @keyframes growAndFloat {
+        0% {
+          transform: scale(0.5);
+          opacity: 1;
+        }
+        30% {
+          transform: scale(1.5);
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(-300px) scale(1);
+          opacity: 0;
+        }
+      }
+
+      @keyframes float {
+        0% {
+          transform: translateY(0);
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(-300px);
+          opacity: 0;
+        }
+      }
+
+      /* Emoji List */
+      .emoji-list {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin-top: 10px;
+      }
+
+      .emoji-list button {
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+      }
+
+      .emoji-list button:hover {
+        transform: scale(1.2);
+      }
+
+      /* Responsive for Tablets and Smaller Screens */
+      @media (max-width: 768px) {
+        .container {
+          grid-template-columns: 1fr;
+          padding: 10px;
+          width: 100%;
+          max-width: 100%;
+          height: 100vh;
+          overflow-y: auto;
+          overflow-x: hidden;
+        }
+
+        .video-section {
+          gap: 10px;
+          width: 100%;
+        }
+
+        video {
+          width: 100%;
+          height: 200px;
+        }
+
+        .controls {
+          flex-direction: column;
+          gap: 10px;
+          width: 100%;
+        }
+
+        button {
+          width: 100%;
+        }
+
+        .chat-section {
+          padding: 10px;
+          width: 100%;
+        }
+
+        .chat-box {
+          height: 150px;
+          width: 100%;
+        }
+
+        .chat-input {
+          flex-direction: column;
+          gap: 10px;
+          width: 100%;
+        }
+
+        .chat-input input {
+          width: 100%;
+        }
+
+        .chat-input button {
+          width: 100%;
+        }
+
+        .emoji-list {
+          width: 100%;
+          flex-wrap: wrap;
+          gap: 5px;
+        }
+
+        .emoji-list button {
+          width: auto;
+          font-size: 24px;
+        }
+      }
+
+      /* Responsive for Phones */
+      @media (max-width: 480px) {
+        body {
+          justify-content: flex-start;
+          padding-top: 10px;
+          overflow-x: hidden;
+        }
+
+        .container {
+          grid-template-columns: 1fr;
+          padding: 5px;
+          width: 100%;
+          max-width: 100%;
+          overflow-x: hidden;
+        }
+
+        video {
+          width: 100%;
+          height: 150px;
+        }
+
+        .controls button {
+          padding: 8px;
+          font-size: 14px;
+          width: 100%;
+        }
+
+        .chat-section {
+          padding: 10px;
+          width: 100%;
+        }
+
+        .chat-box {
+          height: 100px;
+          width: 100%;
+        }
+
+        .chat-input input {
+          width: 100%;
+        }
+
+        .chat-input button {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Video Section -->
+      <div class="video-section">
+        <div class="video-wrapper">
+          <video id="localVideo" autoplay muted></video>
+        </div>
+        <div class="video-wrapper">
+          <video id="remoteVideo" autoplay></video>
+        </div>
+
+        <div class="controls">
+          <button id="startButton">Start Call</button>
+          <button id="joinButton">Join Call</button>
+          <button id="muteButton">Mute</button>
+          <button id="videoButton">Turn Video Off</button>
+          <button id="switchCameraButton">Switch Camera</button>
+        </div>
+      </div>
+
+      <!-- Chat Section -->
+      <div class="chat-section">
+        <div class="chat-header">Chat</div>
+        <div class="chat-box" id="messages"></div>
+
+        <div class="chat-input">
+          <input
+            type="text"
+            id="messageInput"
+            placeholder="Type your message..."
+          />
+          <button id="sendButton">Send</button>
+        </div>
+
+        <!-- Emoji List -->
+        <div class="emoji-list">
+          <button class="emoji-button">❤️</button>
+          <button class="emoji-button">👍</button>
+          <button class="emoji-button">🎉</button>
+          <button class="emoji-button">👏</button>
+          <button class="emoji-button">😂</button>
+          <button class="emoji-button">😮</button>
+          <button class="emoji-button">😢</button>
+          <button class="emoji-button">🤔</button>
+          <button class="emoji-button">👎</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tempat emoji yang melayang -->
+    <div id="emojiContainer"></div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const socket = io(); // Koneksi ke server Socket.IO
+      let localStream;
+      let peerConnection;
+      let currentCamera = 'user'; // Default ke kamera depan
+      const servers = {
+        iceServers: [
+          { urls: "stun:stun.l.google.com:19302" }, // STUN server dari Google
+        ],
+      };
+
+      const localVideo = document.getElementById("localVideo");
+      const remoteVideo = document.getElementById("remoteVideo");
+      const startButton = document.getElementById("startButton");
+      const joinButton = document.getElementById("joinButton");
+      const muteButton = document.getElementById("muteButton");
+      const videoButton = document.getElementById("videoButton");
+      const switchCameraButton = document.getElementById("switchCameraButton");
+      const messageInput = document.getElementById("messageInput");
+      const sendButton = document.getElementById("sendButton");
+      const messages = document.getElementById("messages");
+      const emojiContainer = document.getElementById("emojiContainer");
+      let isEmojiActive = false; // Flag untuk mencegah emoji muncul lagi sebelum klik ulang
+
+      let isMuted = false;
+      let isVideoEnabled = true;
+
+      async function startCall() {
+        const constraints = {
+          video: {
+            facingMode: currentCamera, // Menggunakan kamera yang sesuai
+          },
+          audio: true,
+        };
+
+        try {
+          // Hentikan stream lama jika ada
+          if (localStream) {
+            localStream.getTracks().forEach(track => track.stop());
+          }
+
+          localStream = await navigator.mediaDevices.getUserMedia(constraints);
+          localVideo.srcObject = localStream;
+
+          // Buat peerConnection
+          peerConnection = new RTCPeerConnection(servers);
+
+          peerConnection.onicecandidate = (event) => {
+            if (event.candidate) {
+              socket.emit("iceCandidate", event.candidate);
+            }
+          };
+
+          peerConnection.ontrack = (event) => {
+            remoteVideo.srcObject = event.streams[0];
+          };
+
+          localStream.getTracks().forEach((track) => {
+            peerConnection.addTrack(track, localStream);
+          });
+
+          const offer = await peerConnection.createOffer();
+          await peerConnection.setLocalDescription(offer);
+          socket.emit("offer", offer);
+        } catch (error) {
+          console.error("Error accessing media devices.", error);
+        }
+      }
+
+      // Untuk bergabung dalam panggilan (pengguna kedua)
+      joinButton.onclick = async () => {
+        await startCall(); // Memanggil fungsi startCall
+        socket.on("offer", async (offer) => {
+          await peerConnection.setRemoteDescription(
+            new RTCSessionDescription(offer)
+          );
+          const answer = await peerConnection.createAnswer();
+          await peerConnection.setLocalDescription(answer);
+          socket.emit("answer", answer);
+        });
+      };
+
+      socket.on("answer", async (answer) => {
+        await peerConnection.setRemoteDescription(
+          new RTCSessionDescription(answer)
+        );
+      });
+
+      socket.on("iceCandidate", async (candidate) => {
+        if (candidate) {
+          await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+        }
+      });
+
+      // Mute / Unmute mikrofon
+      muteButton.onclick = () => {
+        isMuted = !isMuted;
+        localStream.getAudioTracks().forEach((track) => {
+          track.enabled = !isMuted;
+        });
+        muteButton.textContent = isMuted ? "Unmute" : "Mute";
+      };
+
+      // Menyalakan / Mematikan video
+      videoButton.onclick = () => {
+        isVideoEnabled = !isVideoEnabled;
+        localStream.getVideoTracks().forEach((track) => {
+          track.enabled = isVideoEnabled;
+        });
+        videoButton.textContent = isVideoEnabled
+          ? "Turn Video Off"
+          : "Turn Video On";
+      };
+
+      // Mengubah kamera (depan / belakang)
+      switchCameraButton.onclick = async () => {
+        // Mengubah ke kamera lain
+        currentCamera = currentCamera === 'user' ? 'environment' : 'user'; // Toggle kamera
+        const constraints = {
+          video: {
+            facingMode: currentCamera,
+          },
+          audio: true,
+        };
+
+        // Hentikan stream lama jika ada
+        localStream.getTracks().forEach(track => track.stop());
+
+        try {
+          localStream = await navigator.mediaDevices.getUserMedia(constraints);
+          localVideo.srcObject = localStream;
+
+          // Hapus semua track yang ada dari peerConnection
+          localStream.getTracks().forEach(track => {
+            peerConnection.getSenders().forEach(sender => {
+              if (sender.track.kind === track.kind) {
+                sender.replaceTrack(track); // Ganti track yang ada dengan track baru
+              }
+            });
+          });
+        } catch (error) {
+          console.error("Error switching camera: ", error);
+        }
+      };
+
+      // Fungsi untuk membuat emoji melayang
+      document.querySelectorAll(".emoji-button").forEach((button) => {
+        button.addEventListener("click", () => {
+          if (!isEmojiActive) {
+            isEmojiActive = true; // Aktifkan flag
+            const emoji = button.textContent;
+
+            // Kirim emoji ke server melalui Socket.IO
+            socket.emit("emoji", emoji);
+
+            // Tambahkan emoji di layar pengguna sendiri
+            addFloatingEmoji(emoji);
+          }
+        });
+      });
+
+      // Menerima emoji dari server dan menampilkannya
+      socket.on("emoji", (emoji) => {
+        addFloatingEmoji(emoji); // Tampilkan emoji yang diterima dari server
+      });
+
+      function addFloatingEmoji(emoji) {
+        const emojiElement = document.createElement("div");
+        emojiElement.textContent = emoji;
+        emojiElement.classList.add("emoji");
+
+        // Menghapus emoji setelah animasi selesai
+        emojiElement.addEventListener("animationend", () => {
+          emojiElement.remove();
+          isEmojiActive = false; // Set flag menjadi false setelah animasi selesai
+        });
+
+        emojiContainer.appendChild(emojiElement);
+      }
+      
+      // Mengirim pesan chat
+      sendButton.onclick = sendMessage;
+
+      // Tambahkan event listener untuk menangani Enter key
+      messageInput.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+          sendMessage();
+        }
+      });
+
+      function sendMessage() {
+        const message = messageInput.value;
+        if (message) {
+          socket.emit("chatMessage", message);
+          addMessage(`You: ${message}`);
+          messageInput.value = "";
+        }
+      }
+
+      socket.on("chatMessage", (message) => {
+        addMessage(`User: ${message}`);
+      });
+
+      function addMessage(text) {
+        const messageElement = document.createElement("p");
+        messageElement.textContent = text;
+        messages.appendChild(messageElement);
+      }
+
+      // Mulai panggilan saat halaman dimuat
+      startButton.onclick = startCall;
+
+    </script>
+  </body>
+</html>

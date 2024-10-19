@@ -1,0 +1,14 @@
+{
+    "name": "video-call-app",
+    "version": "1.0.0",
+    "description": "Simple video call app using WebRTC and Socket.io",
+    "main": "server.js",
+    "scripts": {
+        "start": "node server.js"
+    },
+    "dependencies": {
+        "express": "^4.21.1",
+        "helmet": "^8.0.0",
+        "socket.io": "^4.8.0"
+    }
+}
