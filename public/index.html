@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Virtual Conference Space</title>
+    <title>Video Call App - Emoji Floating Feature</title>
     <style>
       @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap");
 
@@ -384,7 +384,7 @@
       const socket = io(); // Koneksi ke server Socket.IO
       let localStream;
       let peerConnection;
-      let currentCamera = 'user'; // Default ke kamera depan
+      let currentCamera = "user"; // Default ke kamera depan
       const servers = {
         iceServers: [
           { urls: "stun:stun.l.google.com:19302" }, // STUN server dari Google
@@ -418,7 +418,7 @@
         try {
           // Hentikan stream lama jika ada
           if (localStream) {
-            localStream.getTracks().forEach(track => track.stop());
+            localStream.getTracks().forEach((track) => track.stop());
           }
 
           localStream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -497,7 +497,7 @@
       // Mengubah kamera (depan / belakang)
       switchCameraButton.onclick = async () => {
         // Mengubah ke kamera lain
-        currentCamera = currentCamera === 'user' ? 'environment' : 'user'; // Toggle kamera
+        currentCamera = currentCamera === "user" ? "environment" : "user"; // Toggle kamera
         const constraints = {
           video: {
             facingMode: currentCamera,
@@ -506,17 +506,19 @@
         };
 
         // Hentikan stream lama jika ada
-        localStream.getTracks().forEach(track => track.stop());
+        if (localStream) {
+          localStream.getTracks().forEach((track) => track.stop());
+        }
 
         try {
           localStream = await navigator.mediaDevices.getUserMedia(constraints);
           localVideo.srcObject = localStream;
 
           // Hapus semua track yang ada dari peerConnection
-          localStream.getTracks().forEach(track => {
-            peerConnection.getSenders().forEach(sender => {
-              if (sender.track.kind === track.kind) {
-                sender.replaceTrack(track); // Ganti track yang ada dengan track baru
+          localStream.getTracks().forEach((newTrack) => {
+            peerConnection.getSenders().forEach((sender) => {
+              if (sender.track.kind === newTrack.kind) {
+                sender.replaceTrack(newTrack); // Ganti track yang ada dengan track baru
               }
             });
           });
@@ -559,7 +561,7 @@
 
         emojiContainer.appendChild(emojiElement);
       }
-      
+
       // Mengirim pesan chat
       sendButton.onclick = sendMessage;
 
@@ -591,7 +593,6 @@
 
       // Mulai panggilan saat halaman dimuat
       startButton.onclick = startCall;
-
     </script>
   </body>
 </html>
